@@ -5,15 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 public class AppTest {
-    private static final Long timeForReading = 2000l;
-    private static final Long timeForWritting = 2000l;
+    private static final long timeForReading = 2000L;
+    private static final long timeForWritting = 2000L;
     private static final SuperReadWriteLock lock = new SuperReadWriteLock();
     private static String message = "D";
 
     @Test
     public void shouldReadersWorkParallel() throws InterruptedException {
-        Long timeBefore = System.currentTimeMillis();
-        Long timeAfter;
+        long timeBefore = System.currentTimeMillis();
+        long timeAfter;
 
         testOnlyReaders();
         timeAfter = System.currentTimeMillis();
@@ -24,8 +24,8 @@ public class AppTest {
 
     @Test
     public void shouldWritersWorkSerially() throws InterruptedException {
-        Long timeBefore = System.currentTimeMillis();
-        Long timeAfter;
+        long timeBefore = System.currentTimeMillis();
+        long timeAfter;
 
         testOnlyWriters();
         timeAfter = System.currentTimeMillis();

@@ -1,5 +1,6 @@
 package ru.tuanviet.javabox;
 
+
 public class App {
 
     private static final SuperReadWriteLock lock = new SuperReadWriteLock();
@@ -62,6 +63,7 @@ public class App {
 //        testOnlyWriters();
 //        testOnlyReaders();
         System.out.println(message);
+
 
     }
 
