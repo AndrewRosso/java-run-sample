@@ -1,6 +1,5 @@
 package ru.tuanviet.javabox;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -8,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class SuperBench {
+
+
     public void benchmark(Class<?>[] classes) {
         if (classes == null) {
             throw new IllegalArgumentException("Null arguments received");
@@ -18,32 +19,41 @@ public class SuperBench {
         for (Class oneOfClasses : classes) {
             try {
                 Object instance = oneOfClasses.getDeclaredConstructor().newInstance();
-                Method[] allMethods = oneOfClasses.getMethods();
+                Method[] allMethods = oneOfClasses.getDeclaredMethods();
+                System.out.println("BENCHMARK CLASS: " + oneOfClasses.getName().toUpperCase() + "\n\r");
+
+                int countOfMarkedMethods = 0;
                 for (Method method : allMethods) {
                     if (method.isAnnotationPresent(Benchmark.class)) {
+                        countOfMarkedMethods++;
                         String methodName = method.getName();
-                        Annotation annotations = method.getAnnotation(Benchmark.class);
-                        Benchmark mBenchmark = (Benchmark) annotations;
+                        Benchmark annotation = method.getAnnotation(Benchmark.class);
 
-                        int repeats = mBenchmark.repeats();
-                        long timeout = mBenchmark.timeout();
-                        List<Long> resultTime = new ArrayList<>();
+                        int repeats = annotation.repeats();
+                        long timeout = annotation.timeout();
+                        List<Long> repeatsTime = new ArrayList<>();
 
                         for (int i = 0; i < repeats; i++) {
+                            long startTime = 0;
+                            long endTime = 0;
                             try {
-                                long startTime = System.nanoTime();
+                                startTime = System.nanoTime();
                                 method.invoke(instance);
-                                long endTime = System.nanoTime();
-                                resultTime.add(endTime - startTime);
-                                if (resultTime.get(i) > timeout) {
-                                    break;
-                                }
+                                endTime = System.nanoTime();
                             } catch (IllegalAccessException | InvocationTargetException e) {
                                 e.printStackTrace();
                             }
+                            repeatsTime.add(endTime - startTime);
+
+                            if (repeatsTime.get(i) > timeout) {
+                                break;
+                            }
                         }
-                        printMethodsTimeStats(methodName, resultTime, repeats, timeout);
+                        printMethodsTimeStats(methodName, repeatsTime, repeats, timeout);
                     }
+                }
+                if (countOfMarkedMethods == 0) {
+                    System.out.println("Provided class do not have methods marked with a @Benchmark annotation");
                 }
             } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -58,9 +68,9 @@ public class SuperBench {
         System.out.println("");
     }
 
-    private void printMethodsTimeStats(String methodName, List<Long> resultTime, int repeat, long timeout) {
+    private void printMethodsTimeStats(String methodName, List<Long> repeatsTime, int repeat, long timeout) {
         String resultTest = "FAILED";
-        int successfulRepeat = resultTime.size();
+        int successfulRepeat = repeatsTime.size();
 
         if (successfulRepeat == repeat) resultTest = "PASSED";
 
@@ -69,14 +79,14 @@ public class SuperBench {
         System.out.println("Repeats: " + successfulRepeat + "/" + repeat);
         System.out.println("Timeout: " + timeout);
 
-        System.out.println("Min: " + Collections.min(resultTime));
-        System.out.println("Avg: " + averageTime(resultTime));
-        System.out.println("Max: " + Collections.max(resultTime));
+        System.out.println("Min: " + Collections.min(repeatsTime));
+        System.out.println("Avg: " + getAverageTime(repeatsTime));
+        System.out.println("Max: " + Collections.max(repeatsTime));
 
 
-        System.out.println("75% of the numbers are less than or equal to " + getPercentile(resultTime, 75));
-        System.out.println("95% of the numbers are less than or equal to " + getPercentile(resultTime, 95));
-        System.out.println("99% of the numbers are less than or equal to " + getPercentile(resultTime, 99));
+        System.out.println("75% of the numbers are less than or equal to " + getPercentile(repeatsTime, 75));
+        System.out.println("95% of the numbers are less than or equal to " + getPercentile(repeatsTime, 95));
+        System.out.println("99% of the numbers are less than or equal to " + getPercentile(repeatsTime, 99));
         System.out.println("");
     }
 
@@ -93,18 +103,18 @@ public class SuperBench {
         return "> " + result;
     }
 
-    private long getPercentile(List<Long> result, double percentile) {
-        Collections.sort(result);
-        int index = (int) Math.ceil((percentile / (double) 100) * (double) result.size());
-        return result.get(index - 1);
+    private long getPercentile(List<Long> repeatsTime, double percentile) {
+        Collections.sort(repeatsTime);
+        int index = (int) Math.ceil((percentile / 100) * repeatsTime.size());
+        return repeatsTime.get(index - 1);
     }
 
-    private long averageTime(List<Long> resultTime) {
+    private long getAverageTime(List<Long> repeatsTime) {
         long sumOfResultTime = 0;
-        for (long time : resultTime) {
+        for (long time : repeatsTime) {
             sumOfResultTime += time;
         }
-        return sumOfResultTime / resultTime.size();
+        return sumOfResultTime / repeatsTime.size();
     }
 }
 

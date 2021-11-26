@@ -1,13 +1,14 @@
 package ru.tuanviet.javabox;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 
-public class AppTest {
+public class SuperBenchTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionIfBenchmarkMethodParameterIsNull()  {
+    public void shouldThrowExceptionIfBenchmarkMethodParameterIsNull() {
         new SuperBench().benchmark(null);
     }
 
@@ -18,6 +19,7 @@ public class AppTest {
         testClasses1[1] = null;
         new SuperBench().benchmark(testClasses1);
     }
-
-
 }
+
+
+

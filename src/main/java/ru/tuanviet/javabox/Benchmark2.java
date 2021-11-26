@@ -1,12 +1,12 @@
 package ru.tuanviet.javabox;
 
 public class Benchmark2 {
-    @Benchmark(repeats = 30, timeout = 20000)
-    public void should_add_30_numbers_in_1000_nanosecond() {
+    @Benchmark(repeats = 50, timeout = 20000)
+    public void should_add_50_numbers_in_20000_nanosecond() {
         add(10, 15);
     }
 
     private int add(int x, int y) {
-        return x + y;
+        return x * y;
     }
 }
