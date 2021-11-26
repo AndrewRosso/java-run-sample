@@ -9,4 +9,10 @@ public class Benchmark1 {
     private int add(int x, int y) {
         return x + y;
     }
+
+    @Benchmark(repeats = 10, timeout = 10000000)
+    public void should_add1_20_numbers_in_1_millisecond() {
+        add(10, 15);
+    }
+
 }

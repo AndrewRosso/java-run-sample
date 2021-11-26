@@ -1,5 +1,7 @@
 package ru.tuanviet.javabox;
 
+import java.util.Arrays;
+
 public class App {
 
     public static void main(String[] args) {
@@ -7,8 +9,7 @@ public class App {
         Class[] classes = new Class[2];
         classes[0] = Benchmark1.class;
         classes[1] = Benchmark2.class;
-
-       new SuperBench().benchmark(classes);
+        new SuperBench().benchmark(classes);
 
     }
 }

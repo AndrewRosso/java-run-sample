@@ -9,38 +9,43 @@ import java.util.*;
 
 public class SuperBench {
     public void benchmark(Class<?>[] classes) {
+        if (classes == null) {
+            throw new IllegalArgumentException("Null arguments received");
+        }
+
         printHeading();
 
         for (Class oneOfClasses : classes) {
             try {
-                Object instance = oneOfClasses.newInstance();
-                Method method = oneOfClasses.getMethods()[0];
-                String methodName = method.getName();
+                Object instance = oneOfClasses.getDeclaredConstructor().newInstance();
+                Method[] allMethods = oneOfClasses.getMethods();
+                for (Method method : allMethods) {
+                    if (method.isAnnotationPresent(Benchmark.class)) {
+                        String methodName = method.getName();
+                        Annotation annotations = method.getAnnotation(Benchmark.class);
+                        Benchmark mBenchmark = (Benchmark) annotations;
 
-                Annotation annotations = method.getAnnotation(Benchmark.class);
-                Benchmark mBenchmark = (Benchmark) annotations;
-                int repeats = mBenchmark.repeats();
-                long timeout = mBenchmark.timeout();
+                        int repeats = mBenchmark.repeats();
+                        long timeout = mBenchmark.timeout();
+                        List<Long> resultTime = new ArrayList<>();
 
-                List<Long> resultTime = new ArrayList<>();
-
-                for (int i = 0; i < repeats; i++) {
-                    try {
-                        long startTime = System.nanoTime();
-                        method.invoke(instance);
-                        long endTime = System.nanoTime();
-                        resultTime.add(endTime - startTime);
-                        if (resultTime.get(i) > timeout) {
-                            break;
+                        for (int i = 0; i < repeats; i++) {
+                            try {
+                                long startTime = System.nanoTime();
+                                method.invoke(instance);
+                                long endTime = System.nanoTime();
+                                resultTime.add(endTime - startTime);
+                                if (resultTime.get(i) > timeout) {
+                                    break;
+                                }
+                            } catch (IllegalAccessException | InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                        printMethodsTimeStats(methodName, resultTime, repeats, timeout);
                     }
                 }
-
-                printMethodsTimeStats(methodName, resultTime, repeats, timeout);
-
-            } catch (IllegalAccessException | InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
@@ -65,7 +70,7 @@ public class SuperBench {
         System.out.println("Timeout: " + timeout);
 
         System.out.println("Min: " + Collections.min(resultTime));
-        System.out.println("Avg: " + average(resultTime));
+        System.out.println("Avg: " + averageTime(resultTime));
         System.out.println("Max: " + Collections.max(resultTime));
 
 
@@ -94,7 +99,7 @@ public class SuperBench {
         return result.get(index - 1);
     }
 
-    private long average(List<Long> resultTime) {
+    private long averageTime(List<Long> resultTime) {
         long sumOfResultTime = 0;
         for (long time : resultTime) {
             sumOfResultTime += time;
