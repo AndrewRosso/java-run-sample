@@ -6,6 +6,8 @@ import org.junit.Test;
 
 
 public class SuperBenchTest {
+    Class<?>[] testClasses;
+    SuperBench testBench;
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionIfBenchmarkMethodParameterIsNull() {
@@ -14,12 +16,37 @@ public class SuperBenchTest {
 
     @Test(expected = NullPointerException.class)
     public void shouldThrowExceptionIfSomeElementOfBenchmarkMethodParameterIsNull() {
-        Class[] testClasses1 = new Class[2];
-        testClasses1[0] = null;
-        testClasses1[1] = null;
-        new SuperBench().benchmark(testClasses1);
+        testClasses = new Class[]{null,null};
+        new SuperBench().benchmark(testClasses);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionIfClassesWithoutBenchmarkAnnotationMethods() {
+        testClasses = new Class[]{ClassWithoutBenchMethods.class};
+        new SuperBench().benchmark(testClasses);
+    }
+
+    @Test
+    public void shouldGenerateBenchmarkResults(){
+        testClasses = new Class[]{ClassWithBenchMethods.class};
+        testBench = new SuperBench();
+        testBench.benchmark(testClasses);
+        assertThat(testBench.listOfBenchmarkResults.size()).isEqualTo(1);
+    }
+
+
+
+
 }
 
+class ClassWithoutBenchMethods{
+    public void simplyEmptyMethod() {
+    }
+}
+class ClassWithBenchMethods{
+    @Benchmark(repeats = 100, timeout = 1000)
+    public void simplyEmptyMethod() {
+    }
+}
 
 
