@@ -14,12 +14,6 @@ public class SuperBenchTest {
         new SuperBench().benchmark(null);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void shouldThrowExceptionIfSomeElementOfBenchmarkMethodParameterIsNull() {
-        testClasses = new Class[]{null, null};
-        new SuperBench().benchmark(testClasses);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionIfAllClassesWithoutBenchmarkAnnotationMethods() {
         testClasses = new Class[]{ClassWithoutBenchMethods.class, ClassWithoutBenchMethods.class};
@@ -31,7 +25,7 @@ public class SuperBenchTest {
         testClasses = new Class[]{ClassWithoutBenchMethods.class, ClassWithBenchMethods.class};
         testBench = new SuperBench();
         testBench.benchmark(testClasses);
-        assertThat(testBench.mapOfBenchmarkResults.size()).isEqualTo(1);
+        assertThat(testBench.getMapOfBenchmarkResults().size()).isEqualTo(1);
     }
 
     @Test
@@ -40,20 +34,21 @@ public class SuperBenchTest {
         testBench = new SuperBench();
         testBench.benchmark(testClasses);
         assertThat(testBench.
-                mapOfBenchmarkResults.
+                getMapOfBenchmarkResults().
                 get(ClassWithLongBenchMethods.class).
                 get(0).getSuccessfulness()).
                 isEqualTo(false);
     }
+
     @Test
-    public void shouldFailBenchWithFastBenchMethod() {
+    public void shouldBenchWithFastBenchMethod() {
         testClasses = new Class[]{ClassWithFastBenchMethods.class};
         testBench = new SuperBench();
         testBench.benchmark(testClasses);
-        assertThat(testBench.
-                mapOfBenchmarkResults.
-                get(ClassWithFastBenchMethods.class).
-                get(0).getSuccessfulness()).
+        assertThat(testBench
+                .getMapOfBenchmarkResults().
+                        get(ClassWithFastBenchMethods.class).
+                        get(0).getSuccessfulness()).
                 isEqualTo(true);
     }
 
@@ -63,7 +58,7 @@ public class SuperBenchTest {
         testBench = new SuperBench();
         testBench.benchmark(testClasses);
         assertThat(testBench.
-                mapOfBenchmarkResults.
+                getMapOfBenchmarkResults().
                 get(ClassWithBenchMethods.class).
                 get(0).getBenchMethodName()).
                 isEqualTo("> Simply empty method");
@@ -87,6 +82,7 @@ class ClassWithLongBenchMethods {
         Thread.sleep(20);
     }
 }
+
 class ClassWithFastBenchMethods {
     @Benchmark(repeats = 10, timeout = 100000)
     public void simply_empty_method() {

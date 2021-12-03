@@ -4,7 +4,7 @@ public class App {
 
     public static void main(String[] args) {
 
-        Class<?>[] classes = new Class[]{Benchmark1.class,Benchmark2.class,Benchmark3.class};
+        Class<?>[] classes = new Class[]{BenchmarkTestClass1.class, BenchmarkTestClass2.class, BenchmarkTestClass3.class};
 
         new SuperBench().benchmark(classes);
 

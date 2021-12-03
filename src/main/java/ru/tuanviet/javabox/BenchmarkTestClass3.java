@@ -1,6 +1,6 @@
 package ru.tuanviet.javabox;
 
-public class Benchmark3 {
+public class BenchmarkTestClass3 {
     public void should_add_numbers() {
         add(10, 15);
     }

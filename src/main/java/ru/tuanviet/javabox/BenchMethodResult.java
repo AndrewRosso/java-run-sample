@@ -53,9 +53,9 @@ public class BenchMethodResult {
         minTime = Collections.min(repeatsTime);
         avgTime = getAverageTime(repeatsTime);
         maxTime = Collections.max(repeatsTime);
-        percentile75 = getPercentile(repeatsTime,Percentile.SEVENTYFIVE);
-        percentile95 = getPercentile(repeatsTime,Percentile.NINETYFIVE);
-        percentile99 = getPercentile(repeatsTime,Percentile.NINETYNINE);
+        percentile75 = calculatePercentile(repeatsTime,Percentile.SEVENTYFIVE);
+        percentile95 = calculatePercentile(repeatsTime,Percentile.NINETYFIVE);
+        percentile99 = calculatePercentile(repeatsTime,Percentile.NINETYNINE);
     }
     private String methodNameFormatter(String methodName) {
         String methodNameWithoutShould = methodName.replace("should", "");
@@ -93,7 +93,7 @@ public class BenchMethodResult {
         }
         return sumOfResultTime / repeatsTime.size();
     }
-    private long getPercentile(List<Long> repeatsTime, Percentile percentile) {
+    private long calculatePercentile(List<Long> repeatsTime, Percentile percentile) {
         Collections.sort(repeatsTime);
         int index = (int) Math.ceil((percentile.getPercent() / 100) * repeatsTime.size());
         return repeatsTime.get(index - 1);

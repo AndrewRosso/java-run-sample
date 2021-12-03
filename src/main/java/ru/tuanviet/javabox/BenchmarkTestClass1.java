@@ -1,6 +1,9 @@
 package ru.tuanviet.javabox;
 
-public class Benchmark1 {
+import org.junit.runner.RunWith;
+
+@RunWith(SuperBenchRunner.class)
+public class BenchmarkTestClass1 {
     @Benchmark(repeats = 100, timeout = 1000000)
     public void should_add_100_numbers_in_1_millisecond() {
         add(10, 15);

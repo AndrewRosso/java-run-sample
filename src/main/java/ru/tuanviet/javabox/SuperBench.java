@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class SuperBench {
-    Map<Class<?>, List<BenchMethodResult>> mapOfBenchmarkResults;
+    private Map<Class<?>, List<BenchMethodResult>> mapOfBenchmarkResults;
 
     public void benchmark(Class<?>[] classes) {
         if (classes == null) {
@@ -16,18 +16,22 @@ public class SuperBench {
         mapOfBenchmarkResults = new HashMap<>();
         for (Class<?> clazz : classes) {
 
-            Method[] allMethods = clazz.getMethods();
+            if (clazz != null) {
+                Method[] allMethods = clazz.getMethods();
 
-            List<BenchMethodResult> listOfBenchMethodResult = new ArrayList<>();
-            for (Method method : allMethods) {
-                if (method.isAnnotationPresent(Benchmark.class)) {
-                    countOfMarkedMethod++;
-                    listOfBenchMethodResult.add(new BenchMethodResult(clazz, method));
+                List<BenchMethodResult> listOfBenchMethodResult = new ArrayList<>();
+                for (Method method : allMethods) {
+                    if (method.isAnnotationPresent(Benchmark.class)) {
+                        countOfMarkedMethod++;
+                        listOfBenchMethodResult.add(new BenchMethodResult(clazz, method));
+                    }
+                }
+                if (!listOfBenchMethodResult.isEmpty()) {
+                    mapOfBenchmarkResults.put(clazz, listOfBenchMethodResult);
                 }
             }
-            if (!listOfBenchMethodResult.isEmpty()) mapOfBenchmarkResults.put(clazz, listOfBenchMethodResult);
         }
-        if (countOfMarkedMethod==0){
+        if (countOfMarkedMethod == 0) {
             throw new IllegalArgumentException("Methods marked with a @Benchmark annotation not found");
         }
         printBenchmarkResults();
@@ -43,10 +47,15 @@ public class SuperBench {
             }
         }
     }
+
     private void printHeading() {
         System.out.println("-- OUTPUT ------------------------------------------------");
         System.out.println("Benchmark started at "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS"))+"\n");
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSS")) + "\n");
+    }
+
+    public Map<Class<?>, List<BenchMethodResult>> getMapOfBenchmarkResults() {
+        return mapOfBenchmarkResults;
     }
 }
 

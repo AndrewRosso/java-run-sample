@@ -20,7 +20,7 @@ public class BenchPrinter {
                 format("Max: %dms \n", benchMethodResult.getMaxTime()) +
                 format("75%% of the result of time are less than or equal to %dns \n", benchMethodResult.getPercentile75()) +
                 format("95%% of the result of time are less than or equal to %dns \n", benchMethodResult.getPercentile95()) +
-                format("99%% of the result of time are less than or equal to %dns \n", benchMethodResult.getPercentile95());
+                format("99%% of the result of time are less than or equal to %dns \n", benchMethodResult.getPercentile99());
 
         System.out.println(logResult);
     }
